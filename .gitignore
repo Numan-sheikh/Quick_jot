@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+#secret files
+# This file is used to store the Firebase configuration for your app.
+lib/firebase_options.dart
