@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "195377364952",
+    "project_id": "quickjot-b8207",
+    "storage_bucket": "quickjot-b8207.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195377364952:android:ce19674aaa199a38eb3cad",
+        "android_client_info": {
+          "package_name": "com.example.quickjot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGitxGetyQ7ffKg25KdRqj8PeQCSDWzp8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
