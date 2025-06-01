@@ -8,7 +8,10 @@ import 'providers/auth_provider.dart';
 import 'providers/note_provider.dart';
 
 // Import the SplashScreen
-import 'screens/splash/splash_screen.dart'; // <--- Import your splash screen file
+import 'screens/splash/splash_screen.dart';
+
+// Import your new AppTheme file
+import 'core/theme/app_theme.dart'; // <--- ADD THIS LINE
 
 void main() async {
   // Ensure Flutter binding is initialized before using plugins like Firebase
@@ -35,13 +38,14 @@ class QuickJotApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'QuickJot',
-        theme: ThemeData.light(), // Define your light theme
-        darkTheme: ThemeData.dark(), // Define your dark theme
+        theme: AppTheme.lightTheme, // <--- USE YOUR CUSTOM LIGHT THEME
+        darkTheme: AppTheme.darkTheme, // <--- USE YOUR CUSTOM DARK THEME
         // You can also set a default theme mode if desired
-        // themeMode: ThemeMode.system, // or ThemeMode.light, ThemeMode.dark
-
+        themeMode:
+            ThemeMode
+                .system, // <--- Set to system to respect user's device theme, or .light for always light
         // Set the SplashScreen as the initial screen
-        home: const SplashScreen(), // <--- Use SplashScreen here
+        home: const SplashScreen(),
       ),
     );
   }
