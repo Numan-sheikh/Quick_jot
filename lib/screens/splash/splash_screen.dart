@@ -40,10 +40,11 @@ class _SplashScreenState extends State<SplashScreen>
                 CurvedAnimation(parent: animation, curve: Curves.easeOutExpo),
               ),
               child: FadeTransition(
-                opacity: Tween<double>(begin: 0.0, end: 0.5).animate(
+                // FIX: Changed end: 0.5 to end: 1.0 to make the screen fully opaque
+                opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
                   CurvedAnimation(parent: animation, curve: Curves.easeInOut),
                 ),
-                child: child,
+                child: child, // This 'child' is your HomeScreen()
               ),
             );
           },
