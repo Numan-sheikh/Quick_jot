@@ -1,79 +1,134 @@
+// widgets/note_tile.dart
 import 'package:flutter/material.dart';
 
 class NoteTile extends StatelessWidget {
   final String title;
   final String content;
-  final VoidCallback onTap;
-  final Widget? trailing; // Added for the date or any other trailing widget
+  final Widget? trailing; // Existing trailing widget (e.g., date)
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress; // New: Callback for long press
+  final List<String> labels;
+  final bool isPinned;
+  final bool isSelected; // New: Indicates if the note is selected
+  final Color noteColor; // New: Background color for the note card
 
   const NoteTile({
     super.key,
     required this.title,
     required this.content,
-    required this.onTap,
-    this.trailing, // Accept the trailing widget from the HomeScreen
+    this.trailing,
+    this.onTap,
+    this.onLongPress, // Initialize long press
+    this.labels = const [],
+    this.isPinned = false,
+    this.isSelected = false, // Default to false
+    this.noteColor = Colors.white, // Default to white
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Determine the card's background color
+    final cardColor =
+        isSelected
+            ? theme.colorScheme.primaryContainer.withAlpha(
+              128,
+            ) // Highlight color when selected
+            : noteColor.withAlpha(51); // Use provided note color with opacity
+
     return Card(
-      // By NOT setting 'color', 'elevation', 'shape', or 'shadowColor' here,
-      // the Card will now automatically use the values defined in AppTheme's CardTheme.
+      elevation: isSelected ? 4.0 : 2.0, // Higher elevation when selected
+      color: cardColor, // Apply calculated color
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        side:
+            isSelected
+                ? BorderSide(
+                  color: theme.colorScheme.primary,
+                  width: 2.0,
+                ) // Border when selected
+                : BorderSide.none,
+      ),
       child: InkWell(
+        borderRadius: BorderRadius.circular(8.0),
         onTap: onTap,
-        // Match the border radius defined in AppTheme's CardTheme for InkWell splash effect
-        borderRadius: BorderRadius.circular(
-          12,
-        ), // Assumes your CardTheme has 12 radius
-        splashFactory: InkRipple.splashFactory,
+        onLongPress: onLongPress, // Use the new long press callback
         child: Padding(
-          padding: const EdgeInsets.all(
-            16.0,
-          ), // Consistent padding inside the card
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, // Column takes minimum space
             children: [
               Row(
-                // Use a Row to place title and trailing widget side-by-side
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Show pin icon if pinned
+                  if (isPinned)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(
+                        Icons.push_pin,
+                        size: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
                   Expanded(
                     child: Text(
-                      title,
+                      title.isEmpty
+                          ? 'Untitled'
+                          : title, // Show 'Untitled' if title is empty
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        // Use theme's onSurface color for text on the card
-                        color: theme.colorScheme.onSurface,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (trailing !=
-                      null) // Display trailing widget if provided (e.g., date)
+                  if (trailing != null) trailing!,
+                  if (isSelected) // Show a checkmark when selected
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
-                      child: trailing!,
+                      child: Icon(
+                        Icons.check_circle,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                 ],
               ),
-              const SizedBox(height: 8), // Space between title and content
-              // Content Snippet
-              if (content.isNotEmpty) // Only show content if not empty
-                Text(
-                  content,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    // Use theme's onSurface color with an opacity for content text
-                    // FIX: Replaced .withOpacity(0.7) with .withAlpha(179)
-                    color: theme.colorScheme.onSurface.withAlpha(
-                      179,
-                    ), // 70% opaque (255 * 0.7 = 178.5)
-                    height: 1.4, // Line height for readability
+              const SizedBox(height: 8.0),
+              Text(
+                content,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withAlpha(179),
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              // Display Labels
+              if (labels.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Wrap(
+                    spacing: 8.0, // Space between chips
+                    runSpacing: 4.0, // Space between lines of chips
+                    children:
+                        labels
+                            .map(
+                              (label) => Chip(
+                                label: Text(label),
+                                labelStyle: theme.textTheme.labelSmall,
+                                backgroundColor: theme
+                                    .colorScheme
+                                    .secondaryContainer
+                                    .withAlpha(102),
+                                side: BorderSide.none, // No border
+                                padding: EdgeInsets.zero, // No internal padding
+                                visualDensity:
+                                    VisualDensity.compact, // Compact size
+                              ),
+                            )
+                            .toList(),
                   ),
-                  maxLines: 3, // Keep maxLines for list view
-                  overflow: TextOverflow.ellipsis,
                 ),
             ],
           ),
