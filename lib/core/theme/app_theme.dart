@@ -35,15 +35,13 @@ class AppTheme {
     ),
 
     // --- Modernized Card Theme for Light Mode ---
-    cardTheme: CardTheme(
-      // Removed 'const' as the color is now dynamic
+    cardTheme: CardThemeData(
       color: AppColors.lightSurface.withAlpha(229), // 90% opaque white
       elevation: 6, // Increased elevation for a more prominent floating effect
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ), // Rounded corners for modern aesthetic
-      // FIX: Replaced .withOpacity() with .withAlpha() for shadowColor
       shadowColor: Colors.grey.withAlpha(76), // 30% opaque (255 * 0.3 = 76.5)
     ),
 
@@ -91,15 +89,13 @@ class AppTheme {
     ),
 
     // --- Modernized Card Theme for Dark Mode ---
-    cardTheme: CardTheme(
-      // Removed 'const' as the color is now dynamic
+    cardTheme: CardThemeData(
       color: AppColors.darkSurface.withAlpha(204), // 80% opaque dark grey
       elevation: 6, // Increased elevation for a more prominent floating effect
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ), // Rounded corners for modern aesthetic
-      // FIX: Replaced .withOpacity() with .withAlpha() for shadowColor
       shadowColor: Colors.black.withAlpha(102), // 40% opaque (255 * 0.4 = 102)
     ),
 
