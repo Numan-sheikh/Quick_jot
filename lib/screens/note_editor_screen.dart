@@ -75,12 +75,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     if (title.isEmpty && content.isEmpty) {
       _logger.w('Save attempt: Title and content are empty. Showing snackbar.');
+      if (!mounted) return;
       AppUtils.showSnackBar(context, 'Note cannot be empty!', isError: true);
       return;
     }
 
+    final noteProvider = Provider.of<NoteProvider>(context, listen: false);
+
     try {
-      final noteProvider = Provider.of<NoteProvider>(context, listen: false);
       if (_isNewNote) {
         _logger.i('Attempting to add new note.');
         await noteProvider.addNote(
@@ -88,12 +90,15 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           content,
           labels: labels,
           isPinned: _isPinned,
-          colorValue: _noteColor.value, // Pass color value
+          colorValue: _noteColor.toARGB32(), // ✅ use toARGB32 to avoid `.value`
         );
+
+        if (!mounted) return;
         AppUtils.showSnackBar(context, 'Note added!');
       } else {
         if (_docId == null) {
           _logger.e('Error: Attempted to edit a note with a null document ID.');
+          if (!mounted) return;
           AppUtils.showSnackBar(
             context,
             'Error: Cannot edit note without an ID.',
@@ -101,25 +106,28 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           );
           return;
         }
+
         _logger.i('Attempting to update note: $_docId');
         await noteProvider.updateNote(_docId!, {
           'title': title,
           'content': content,
           'pinned': _isPinned,
           'labels': labels,
-          'colorValue': _noteColor.value, // Include color value in update
-          'createdAt':
-              widget
-                  .existingNote!['createdAt'], // Keep original createdAt for existing notes
+          'colorValue': _noteColor.toARGB32(), // ✅ Safe and modern
+          'createdAt': widget.existingNote!['createdAt'],
         });
+
+        if (!mounted) return;
         AppUtils.showSnackBar(context, 'Note updated!');
       }
+
       _logger.i('Note saved successfully. Navigating back.');
       if (mounted) {
         Navigator.pop(context);
       }
     } catch (e) {
       _logger.e('Error saving note', error: e);
+      if (!mounted) return;
       AppUtils.showSnackBar(context, 'Failed to save note.', isError: true);
     }
   }

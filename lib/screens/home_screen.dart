@@ -168,41 +168,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Handles deletion of all currently selected notes.
   Future<void> _deleteSelectedNotes() async {
-    if (_selectedNoteIds.isEmpty) {
-      return; // Do nothing if no notes are selected.
-    }
-
-    final initialContext = context; // Capture context before async gap.
-    final scaffoldMessenger = ScaffoldMessenger.of(
-      initialContext,
-    ); // Get ScaffoldMessenger early.
+    if (_selectedNoteIds.isEmpty) return;
 
     final bool? confirm = await showDialog<bool>(
-      context: initialContext, // Use the captured context for the dialog.
+      context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(
-            'Delete ${_selectedNoteIds.length} Note(s)?', // Dialog title.
-          ),
+          title: Text('Delete ${_selectedNoteIds.length} Note(s)?'),
           content: const Text(
-            'Are you sure you want to delete the selected note(s)? This cannot be undone.', // Dialog content.
+            'Are you sure you want to delete the selected note(s)? This cannot be undone.',
           ),
           actions: <Widget>[
             TextButton(
-              onPressed:
-                  () =>
-                      Navigator.of(dialogContext).pop(false), // Cancel button.
+              onPressed: () => Navigator.of(dialogContext).pop(false),
               child: const Text('Cancel'),
             ),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor:
-                    Theme.of(
-                      dialogContext,
-                    ).colorScheme.error, // Red background for delete button.
+                backgroundColor: Theme.of(dialogContext).colorScheme.error,
               ),
-              onPressed:
-                  () => Navigator.of(dialogContext).pop(true), // Delete button.
+              onPressed: () => Navigator.of(dialogContext).pop(true),
               child: const Text('Delete'),
             ),
           ],
@@ -212,40 +197,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (!mounted) {
       _logger.w('Widget unmounted after delete confirmation dialog.');
-      return; // Exit if widget is unmounted.
+      return;
     }
 
     if (confirm == true) {
       _logger.i('User confirmed deletion of ${_selectedNoteIds.length} notes.');
+
       final noteProvider = Provider.of<NoteProvider>(
-        initialContext, // Use the captured context for Provider.
+        context,
         listen: false,
-      ); // Get NoteProvider.
+      ); // OK because `mounted == true`
+
       try {
         for (final id in _selectedNoteIds) {
-          await noteProvider.deleteNote(id); // Delete each selected note.
+          await noteProvider.deleteNote(id);
           _logger.d('Deleted note ID: $id');
         }
-        if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            // Use captured ScaffoldMessenger.
-            AppUtils.buildSnackBar(
-              '${_selectedNoteIds.length} note(s) deleted!', // Show success message.
-            ),
-          );
-        }
-        _cancelSelection(); // Exit selection mode after deletion.
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          AppUtils.buildSnackBar('${_selectedNoteIds.length} note(s) deleted!'),
+        );
+
+        _cancelSelection();
       } catch (e) {
         _logger.e('Failed to delete selected notes', error: e);
-        if (mounted) {
-          scaffoldMessenger.showSnackBar(
-            // Use captured ScaffoldMessenger.
-            AppUtils.buildSnackBar(
-              'Failed to delete notes.',
-              isError: true, // Indicate an error.
-            ),
-          );
-        }
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          AppUtils.buildSnackBar('Failed to delete notes.', isError: true),
+        );
       }
     } else {
       _logger.d('Deletion of selected notes cancelled.');
@@ -955,27 +938,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// Ensure your AppUtils has a buildSnackBar method that returns a SnackBar widget.
-// The showSnackBar method should then use ScaffoldMessenger directly.
-// Example of AppUtils.dart:
-// class AppUtils {
-//   static SnackBar buildSnackBar(String message, {bool isError = false}) {
-//     return SnackBar(
-//       content: Text(message),
-//       backgroundColor: isError ? Colors.red : Colors.green,
-//     );
-//   }
-
-//   // You can remove this showSnackBar or adapt it to use ScaffoldMessenger internally,
-//   // but the direct usage in HomeScreen methods is more robust for async operations.
-//   static void showSnackBar(BuildContext context, String message, {bool isError = false}) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       buildSnackBar(message, isError: isError),
-//     );
-//   }
-
-//   static Color applyOpacity(Color color, double opacity) {
-//     return color.withOpacity(opacity);
-//   }
-// }
